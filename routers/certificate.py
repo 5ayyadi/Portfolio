@@ -2,11 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from models import Certificate, BaseResponse, CertificateResponse
 from core.db import MongoDBClient
 from core.security import api_key_required
+import logging
 from bson import ObjectId
 from controllers.time_calculator import calculate_duration
 
 router = APIRouter()
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 
 # Certificate Crud
 @router.post("/create/", response_model=CertificateResponse, dependencies=[Depends(api_key_required)])
@@ -18,6 +20,7 @@ async def create_certificate(certificate: Certificate):
     
     certificate_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Certificate")
     res = certificate_collection.insert_one(certificate.model_dump())
+    logging.info(f"Certificate created with id: {res.inserted_id}")
     return {"result": [certificate], "msg": "Certificate created successfully"}
 
 
@@ -48,8 +51,10 @@ async def update_certificate(id: str, certificate: Certificate):
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Certificate not found")
 
+    logging.info(f"Certificate updated with id: {id}")
+    
     updated_certificate = certificate_collection.find_one({"_id": ObjectId(id)})
-    return {"result": updated_certificate, "msg": "Certificate updated successfully"}
+    return {"result": [updated_certificate], "msg": "Certificate updated successfully"}
 
 @router.delete("/delete/{id}", response_model=BaseResponse, dependencies=[Depends(api_key_required)])
 async def delete_certificate(id: str):
@@ -71,5 +76,8 @@ async def delete_certificate(id: str):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Failed to delete the certificate")
     
+    logging.info(f"Certificate deleted with id: {id}")
+
+    certificate_doc["_id"] = str(certificate_doc["_id"])
     return {"result": certificate_doc, "msg": "Certificate deleted successfully"}
 

@@ -20,7 +20,7 @@ class WorkResponse(BaseResponse):
 class EducationResponse(BaseResponse):
     result: list[Education]
     
-class CertificateResponse(BaseResponse):
+class  CertificateResponse(BaseResponse):
     result: list[Certificate]
 
 class SkillResponse(BaseResponse):

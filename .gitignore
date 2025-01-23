@@ -1,6 +1,8 @@
 # Temporary test files
 tt.*
 
+DB/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

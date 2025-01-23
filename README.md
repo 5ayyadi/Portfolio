@@ -9,6 +9,7 @@ This project is a FastAPI-based web application designed to manage a personal po
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
+- [Models](#models)
 - [Testing](#testing)
 - [Environment Variables](#environment-variables)
 - [Contributing](#contributing)
@@ -73,6 +74,57 @@ Here are some of the key API endpoints:
 
 For detailed information about each endpoint, refer to the [API documentation](http://127.0.0.1:8000/docs).
 
+## Models
+
+The application uses Pydantic models for data validation. Here are some of the key models:
+
+- **Person**:
+  ```python
+  from pydantic import BaseModel
+
+  class Person(BaseModel):
+      id: str
+      name: str
+      email: str
+      phone: str
+      address: str
+  ```
+
+- **Education**:
+  ```python
+  from pydantic import BaseModel
+
+  class Education(BaseModel):
+      id: str
+      institution: str
+      degree: str
+      field_of_study: str
+      start_date: str
+      end_date: str
+  ```
+
+- **Certification**:
+  ```python
+  from pydantic import BaseModel
+
+  class Certification(BaseModel):
+      id: str
+      name: str
+      issuing_organization: str
+      issue_date: str
+      expiration_date: str
+  ```
+
+- **Skill**:
+  ```python
+  from pydantic import BaseModel
+
+  class Skill(BaseModel):
+      id: str
+      name: str
+      proficiency: str
+  ```
+
 ## Testing
 
 To run the tests, use:
@@ -96,7 +148,6 @@ Contributions are welcome! If you'd like to contribute, please fork the reposito
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
 
 ### Instructions for Customization
 - Replace `your_username` and `your_repo_name` with your actual GitHub username and repository name.
