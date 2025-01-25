@@ -17,8 +17,7 @@ async def create_person(person: Person):
         This Function creates the personal info,
         if there's an exisiting person modify it.
     """
-    logger.info("Creating or updating person")
-    
+    logger.info(f"Creating or updating person {person.model_dump_json()}")
     person_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Person")
     existing_person = person_collection.find_one()
     

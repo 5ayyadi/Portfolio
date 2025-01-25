@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    ports:
+      - 27017:27017
+    networks:
+      - portfolio-network
+    volumes:
+      - mongo-data:/data/db
+
+  fastapi:
+    build: .
+    container_name: fastapi
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - API_KEY=${API_KEY}
+    ports:
+      - 8000:8000
+    depends_on:
+      - mongo
+    networks:
+      - portfolio-network
+
+networks:
+  portfolio-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
