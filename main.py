@@ -5,12 +5,12 @@ from contextlib import asynccontextmanager
 import os 
 import logging
 
-
 MONGO_URI = os.getenv('MONGO_URI')
+TEST_MONGO_URI = os.getenv('TEST_MONGO_URI')
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    uri = MONGO_URI
+    uri = TEST_MONGO_URI if os.getenv('TESTING') else MONGO_URI
     is_mongo_started = MongoDBClient.initialize(uri)
     if is_mongo_started is True:
         logging.info(f"MongoDB server is started \n URI : {uri}")
