@@ -20,7 +20,7 @@ class Tag(StrEnum):
     DATABASE = "Database"
 
 class Skill(BaseModel):
-    _id: str | None = None
+    id: str | None = None
     name : str
     level : SkillLevel
     level_name: str  

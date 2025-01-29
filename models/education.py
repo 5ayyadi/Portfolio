@@ -2,7 +2,7 @@ from pydantic import BaseModel, field_validator, ValidationInfo
 from datetime import datetime
 
 class Education(BaseModel):
-    _id: str | None = None
+    id: str | None = None
     institution : str
     degree : str
     start : str

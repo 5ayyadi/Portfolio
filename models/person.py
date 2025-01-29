@@ -21,7 +21,7 @@ class Contact(BaseModel):
         return v
 
 class Person(BaseModel):
-    _id: str | None = None
+    id: str | None = None
     name: str
     birthday: str
     position: str

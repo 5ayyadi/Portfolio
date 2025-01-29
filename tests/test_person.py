@@ -1,65 +1,62 @@
 from fastapi.testclient import TestClient
-from .mongodb_test import mongodb_test
 from main import app
-import os
+import os 
+import logging
+
+os.environ['TESTING'] = '1'
+API_KEY = os.getenv("API_KEY")
 
 client = TestClient(app)
 
-API_KEY = os.getenv("API_KEY")
+person_json = {
+    "name": "John Doe",
+    "birthday": "2002-02-02",
+    "position": "Worker",
+    "contact": {
+        "email": "john.doe@example.com",
+        "phone": "+1234567890",
+        "linkedin": "https://www.linkedin.com/in/johndoe",
+        "github": "https://www.github.com/johndoe"
+    },
+    "description": "A hardworking individual."
+}
 
-
-@mongodb_test(collection="Person")
 def test_create_person():
-    person = {
-        "name": "John Doe", 
-        "birthday": "1999-09-09", 
-        "position": "Software Developer", 
-        "contact": {
-            "email": "john@example.com",
-            "phone": "1234567890"
-        },
-        "description": "An experienced software developer."
-    }
     
     response = client.post(
+        "/person/create", 
+        headers={"api-key": API_KEY}, 
+        json=person_json)
+    
+    assert response.status_code == 200
+    assert response.json().get("result") == person_json
+    assert response.json().get("msg") == "Person created successfully"
+    print(response.json())
+
+
+def test_create_person_bad_token():
+    response = client.post(
         "/person/create",
-        headers={"api-key": API_KEY},  
-        json=person,
+        headers={"api-key": "bad_token"},
+        json=person_json,
     )
-    
+    assert response.status_code == 403
+    assert response.json().get("detail") == "Could not validate credentials"
+
+
+def test_create_existing_person():
+    person_json["name"] = "Jane Doe"
+    response = client.post(
+        "/person/create",
+        headers={"api-key": API_KEY},
+        json=person_json,
+    )
     assert response.status_code == 200
-    assert response.json() == {
-        "msg": "Person updated successfully",
-        "status_code": 200,
-        "result": {
-            "name": "John Doe",
-            "birthday": "1999-09-09",
-            "position": "Software Developer",
-            "contact": {
-                "email": "john@example.com",
-                "phone": "1234567890",
-                "linkedin": None  # Added this key
-            },
-            "description": "An experienced software developer."
-        }
-    }
-    
-@mongodb_test(collection="Person")
+    assert response.json().get("msg") == "Person updated successfully"
+
 def test_read_person():
-    response = client.get("/person/read")
+    response = client.get(
+        "/person/read", 
+    )
     assert response.status_code == 200
-    assert response.json() == {
-        "msg": "OK",
-        "status_code": 200,
-        "result": {
-            "name": "John Doe",
-            "birthday": "1999-09-09",
-            "position": "Software Developer",
-            "contact": {
-                "email": "john@example.com",
-                "phone": "1234567890",
-                "linkedin": None  # Added this key
-            },
-            "description": "An experienced software developer."
-        }
-    }
+    assert response.json().get("result") == person_json

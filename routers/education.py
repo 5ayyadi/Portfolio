@@ -21,7 +21,7 @@ async def create_education(education: Education):
     logger.info("Creating a new education experience")
     education_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Education")
     res = education_collection.insert_one(education.model_dump())
-    logger.info(f"Education experience created with id: {res.inserted_id}")
+    education.id = str(res.inserted_id)
     return {"result": [education], "msg": "Education experience created successfully"}
 
 
@@ -78,7 +78,7 @@ async def delete_education_experience(id: str):
 
 
 @router.get("/duration/", response_model=BaseResponse)
-async def calc_duration(id: str):
+async def calc_duration(id: str | None = None):
     """
         This function calculates the duration of an education experience.
     """

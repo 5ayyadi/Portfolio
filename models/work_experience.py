@@ -2,6 +2,7 @@ from pydantic import BaseModel, field_validator, ValidationInfo
 from datetime import datetime
 
 class Work(BaseModel):
+    id : str | None = None
     company : str
     position : str
     start : str

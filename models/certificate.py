@@ -2,7 +2,7 @@ from pydantic import BaseModel, field_validator
 from datetime import datetime
 
 class Certificate(BaseModel):
-    _id: str | None = None
+    id: str | None = None
     name: str
     date: str
     desc: str

@@ -20,8 +20,3 @@ class MongoDBClient:
         if cls._instance is None:
             raise ValueError("MongoDBClient has not been initialized. Call `initialize` first.")
         return cls._instance
-
-    # @classmethod
-    # def get_database(cls) -> Database:
-    #     client = cls.get_client()
-    #     return client["Porfolio"]
