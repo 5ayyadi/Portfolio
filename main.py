@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from routers import person, work_experience, certificate, education, skill
 from core.db import MongoDBClient
 from contextlib import asynccontextmanager
+from errors.error_handler import add_default_handlers
 import os 
 import logging
 
@@ -13,7 +14,7 @@ async def lifespan(app: FastAPI):
     uri = TEST_MONGO_URI if os.getenv('TESTING') else MONGO_URI
     is_mongo_started = MongoDBClient.initialize(uri)
     if is_mongo_started is True:
-        logging.info(f"MongoDB server is started \n URI : {uri}")
+        logging.info(f"MongoDB server is started")
     db_client = MongoDBClient.get_client()
     yield
     
@@ -21,6 +22,8 @@ async def lifespan(app: FastAPI):
     MongoDBClient._instance = None
 
 app = FastAPI(lifespan=lifespan)
+
+add_default_handlers(app)
 
 app.include_router(person.router, prefix="/person",tags=["Person"])
 app.include_router(work_experience.router, prefix="/work",tags=["Work"])

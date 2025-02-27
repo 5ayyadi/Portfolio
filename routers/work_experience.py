@@ -5,6 +5,8 @@ from core.db import MongoDBClient
 from core.security import api_key_required
 from bson import ObjectId
 from controllers.time_calculator import calculate_duration
+from errors.error_schema import NoResultFound
+
 
 router = APIRouter()
 
@@ -35,6 +37,8 @@ async def read_work_experiences():
     """
     logger.info("Reading all work experiences")
     work_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Work")
+    if work_collection.count_documents({}) == 0:
+        raise NoResultFound
     work_experiences = list(work_collection.find())
     logger.info(f"Found {len(work_experiences)} work experiences")
     return {"result": work_experiences}
@@ -55,7 +59,7 @@ async def update_work_experience(id: str, work: Work):
 
     if updated_work is None:
         logger.error(f"Work experience with id: {id} not found")
-        raise HTTPException(status_code=404, detail="Work experience not found")
+        raise NoResultFound
     
     logger.info(f"Work experience with id: {id} updated successfully")
     return {"result": [updated_work], "msg": "Work experience updated successfully"}
@@ -72,7 +76,7 @@ async def delete_work_experience(id: str):
 
     if delete_result.deleted_count == 0:
         logger.error(f"Work experience with id: {id} not found")
-        raise HTTPException(status_code=404, detail="Work experience not found")
+        raise NoResultFound
     
     logger.info(f"Work experience with id: {id} deleted successfully")
     return {"msg": "Work experience deleted successfully"}
@@ -84,7 +88,7 @@ async def calc_duration(id: str):
     work_dict = work_collection.find_one(filter={"_id": ObjectId(id)})
     if not work_dict:
         logger.error(f"Work experience with id: {id} not found")
-        raise HTTPException(status_code=404, detail="Work experience not found")
+        raise NoResultFound
     year, month = calculate_duration(start=work_dict.get("start"), end=work_dict.get("end"))
     logger.info(f"Duration for work experience with id: {id} is {year} years and {month} months")
     return {"result": {"duration": {"years": year, "months": month}}}
