@@ -5,7 +5,7 @@ from core.db import MongoDBClient
 from core.security import api_key_required
 from bson import ObjectId
 from controllers.time_calculator import calculate_duration
-
+from errors.error_schema import NoResultFound
 router = APIRouter()
 
 # Configure logging
@@ -54,7 +54,7 @@ async def update_education_experience(id: str, education: Education):
 
     if result.modified_count == 0:
         logger.warning(f"Education experience with id: {id} not found or nothing to update")
-        raise HTTPException(status_code=404, detail="Education experience not found or nothing to update")
+        raise NoResultFound
     
     logger.info(f"Education experience with id: {id} updated successfully")
     return {"result": [education], "msg": "Education experience updated successfully"}
@@ -70,8 +70,8 @@ async def delete_education_experience(id: str):
     result = education_collection.delete_one({"_id": ObjectId(id)})
 
     if result.deleted_count == 0:
-        logger.warning(f"Education experience with id: {id} not found")
-        raise HTTPException(status_code=404, detail="Education experience not found")
+        logger.warning(f"Failed to delete education with this id : {id} ")
+        raise HTTPException(status_code=404, detail="Failed to delete the education experience")
 
     logger.info(f"Education experience with id: {id} deleted successfully")
     return {"msg": "Education experience deleted successfully"}
@@ -87,7 +87,7 @@ async def calc_duration(id: str | None = None):
     education_dict = education_collection.find_one(filter={"_id": ObjectId(id)})
     if not education_dict:
         logger.warning(f"Education experience with id: {id} not found")
-        raise HTTPException(status_code=404, detail="Education experience not found")
+        raise NoResultFound
     year, month = calculate_duration(start=education_dict.get("start"), end=education_dict.get("end"))
     logger.info(f"Calculated duration: {year} years and {month} months for education experience with id: {id}")
     return {"result": {"duration": {"years": year, "months": month}}}

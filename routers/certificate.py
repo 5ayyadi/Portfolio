@@ -4,7 +4,7 @@ from core.db import MongoDBClient
 from core.security import api_key_required
 import logging
 from bson import ObjectId
-from controllers.time_calculator import calculate_duration
+from errors.error_schema import NoResultFound
 
 router = APIRouter()
 
@@ -34,6 +34,8 @@ async def read_certificate_experiences():
     """
     certificate_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Certificate")
     certificate_experiences = list(certificate_collection.find())
+    if len(certificate_experiences) == 0:
+        raise NoResultFound        
     return {"result": certificate_experiences}
 
 @router.put("/update/{id}", response_model=CertificateResponse, dependencies=[Depends(api_key_required)])
@@ -49,7 +51,7 @@ async def update_certificate(id: str, certificate: Certificate):
     result = certificate_collection.update_one({"_id": ObjectId(id)}, {"$set": update_data})
     
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Certificate not found")
+        raise NoResultFound
 
     logging.info(f"Certificate updated with id: {id}")
     
@@ -68,7 +70,7 @@ async def delete_certificate(id: str):
     certificate_doc = certificate_collection.find_one({"_id": ObjectId(id)})
     
     if certificate_doc is None:
-        raise HTTPException(status_code=404, detail="Certificate not found")
+        raise NoResultFound
     
     # Perform the deletion
     result = certificate_collection.delete_one({"_id": ObjectId(id)})

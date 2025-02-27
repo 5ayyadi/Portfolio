@@ -1,6 +1,7 @@
 from pydantic import BaseModel, field_validator, EmailStr
 from datetime import datetime
 import re
+from errors.error_handler import WrongInput
 
 class Contact(BaseModel):
     email: EmailStr
@@ -11,13 +12,13 @@ class Contact(BaseModel):
     @field_validator('phone')
     def validate_phone(cls, v):
         if v and not re.match(r'^\+?\d{10,15}$', v):
-            raise ValueError('Invalid phone number format for field "phone"')
+            raise WrongInput
         return v
     
     @field_validator('linkedin')
     def validate_linkedin(cls, v):
         if v and not re.match(r'^https://www.linkedin.com/in/.+$', v):
-            raise ValueError('Invalid LinkedIn URL for field "linkedin"')
+            raise WrongInput
         return v
 
 class Person(BaseModel):
@@ -33,5 +34,5 @@ class Person(BaseModel):
         try:
             datetime.strptime(v, '%Y-%m-%d')  # Adjust format as needed
         except ValueError:
-            raise ValueError('Invalid date format for field "birthday". It must be in the format YYYY-MM-DD')
+            raise WrongInput
         return v

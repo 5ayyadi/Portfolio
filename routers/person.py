@@ -4,6 +4,7 @@ from models import PersonResponse, Person, BaseResponse
 from core.db import MongoDBClient
 from core.security import api_key_required
 from controllers.time_calculator import calculate_age
+from errors.error_schema import NoResultFound
 
 router = APIRouter()
 
@@ -42,6 +43,8 @@ async def read_person():
     logger.info("Reading person information")
     person_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Person")
     person = person_collection.find_one()
+    if person is None:
+        raise NoResultFound
     logger.info("Person information retrieved")
     return {"result": person}
 
@@ -50,6 +53,8 @@ async def calc_age():
     logger.info("Calculating age")
     person_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Person")
     person_dict = person_collection.find_one()
+    if person_dict is None:
+        raise NoResultFound
     person = Person(**person_dict)
     age = calculate_age(person)
     logger.info(f"Age calculated: {age}")

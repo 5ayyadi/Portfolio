@@ -1,5 +1,6 @@
 from pydantic import BaseModel, field_validator
 from datetime import datetime
+from errors.error_handler import WrongInput
 
 class Certificate(BaseModel):
     id: str | None = None
@@ -12,5 +13,5 @@ class Certificate(BaseModel):
         try:
             datetime.strptime(v, '%Y-%m') 
         except ValueError:
-            raise ValueError(f"{v} must be in the format YYYY-MM")
+            raise WrongInput
         return v

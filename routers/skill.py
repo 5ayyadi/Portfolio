@@ -4,6 +4,7 @@ from models import Skill, SkillResponse, BaseResponse
 from core.db import MongoDBClient
 from core.security import api_key_required
 from bson import ObjectId
+from errors.error_schema import NoResultFound
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -52,10 +53,9 @@ async def update_skill(id: str, skill: Skill):
         {"$set": skill.model_dump()},
         return_document=True
     )
-
     if updated_skill is None:
         logger.error("Skill with id %s not found", id)
-        raise HTTPException(status_code=404, detail="Skill not found")
+        raise NoResultFound
     
     logger.info("Skill with id %s updated successfully", id)
     return {"result": [updated_skill], "msg": "Skill updated successfully"}
@@ -72,7 +72,7 @@ async def delete_skill(id: str):
 
     if delete_result.deleted_count == 0:
         logger.error("Skill with id %s not found", id)
-        raise HTTPException(status_code=404, detail="Skill not found")
+        raise NoResultFound
     
     logger.info("Skill with id %s deleted successfully", id)
     return {"msg": "Skill deleted successfully"}

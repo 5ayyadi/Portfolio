@@ -2,7 +2,6 @@ from pymongo import MongoClient
 from threading import Lock
 import logging
 
-
 class MongoDBClient:
     _instance = None
     _lock = Lock()
