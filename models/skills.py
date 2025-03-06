@@ -1,7 +1,5 @@
-from pydantic import BaseModel, field_validator
-from enum import IntEnum
-from enum import StrEnum
-
+from pydantic import BaseModel, model_validator
+from enum import IntEnum, StrEnum
 
 class SkillLevel(IntEnum):
     BEGINNER = 1
@@ -10,7 +8,6 @@ class SkillLevel(IntEnum):
     ADVANCED = 4
     EXPERT = 5
     MASTER = 6
-    
 
 class Tag(StrEnum):
     LANGUAGE = "Language"
@@ -20,13 +17,14 @@ class Tag(StrEnum):
     DATABASE = "Database"
 
 class Skill(BaseModel):
-    id: str | None = None
-    name : str
-    level : SkillLevel
-    level_name: str  
+    name: str
+    level: SkillLevel
     tag: Tag
+    level_name: str | None = None
 
-    
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.level_name = self.level.name
+    @model_validator(mode="before")
+    def set_level_name(cls, values):
+        level = values.get('level')
+        if level is not None:
+            values['level_name'] = SkillLevel(level).name
+        return values

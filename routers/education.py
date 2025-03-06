@@ -21,7 +21,6 @@ async def create_education(education: Education):
     logger.info("Creating a new education experience")
     education_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Education")
     res = education_collection.insert_one(education.model_dump())
-    education.id = str(res.inserted_id)
     return {"result": [education], "msg": "Education experience created successfully"}
 
 

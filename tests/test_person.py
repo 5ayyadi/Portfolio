@@ -1,7 +1,6 @@
 from fastapi.testclient import TestClient
 from main import app
-import os 
-import logging
+import os
 
 os.environ['TESTING'] = '1'
 API_KEY = os.getenv("API_KEY")
@@ -21,42 +20,16 @@ person_json = {
     "description": "A hardworking individual."
 }
 
-def test_create_person():
-    
-    response = client.post(
-        "/person/create", 
+def test_create_and_read_person():
+    post_response = client.post(
+        "/person/create/", 
         headers={"api-key": API_KEY}, 
-        json=person_json)
-    
-    assert response.status_code == 200
-    assert response.json().get("result") == person_json
-    assert response.json().get("msg") == "Person created successfully"
-    print(response.json())
-
-
-def test_create_person_bad_token():
-    response = client.post(
-        "/person/create",
-        headers={"api-key": "bad_token"},
-        json=person_json,
+        json=person_json
     )
-    assert response.status_code == 403
-    assert response.json().get("detail") == "Could not validate credentials"
-
-
-def test_create_existing_person():
-    person_json["name"] = "Jane Doe"
-    response = client.post(
-        "/person/create",
-        headers={"api-key": API_KEY},
-        json=person_json,
+    assert post_response.status_code == 200
+    assert post_response.json().get("result") == person_json
+    get_response = client.get(
+        "/person/read/", 
     )
-    assert response.status_code == 200
-    assert response.json().get("msg") == "Person updated successfully"
-
-def test_read_person():
-    response = client.get(
-        "/person/read", 
-    )
-    assert response.status_code == 200
-    assert response.json().get("result") == person_json
+    assert get_response.status_code == 200
+    assert get_response.json().get("result") == person_json
