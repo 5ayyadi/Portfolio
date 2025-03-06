@@ -34,22 +34,22 @@ This project is a FastAPI-based web application designed to manage a personal po
 
 1. Clone the repository:
 
-   ```bash
-   git clone https://github.com/your_username/your_repo_name.git
-   cd your_repo_name
-   ```
+  ```bash
+  git clone https://github.com/your_username/your_repo_name.git
+  cd your_repo_name
+  ```
 
 2. Install dependencies using Poetry:
 
-   ```bash
-   poetry install
-   ```
+  ```bash
+  poetry install
+  ```
 
 3. Set up your environment variables. You can create a `.env` file in the root directory with the following content:
 
-   ```plaintext
-   API_KEY=your_api_key
-   ```
+  ```plaintext
+  API_KEY=your_api_key
+  ```
 
 ## Usage
 
@@ -83,11 +83,11 @@ The application uses Pydantic models for data validation. Here are some of the k
   from pydantic import BaseModel
 
   class Person(BaseModel):
-      id: str
-      name: str
-      email: str
-      phone: str
-      address: str
+    name: str
+    birthday: str
+    position: str
+    contact: Contact
+    description: str
   ```
 
 - **Education**:
@@ -95,24 +95,21 @@ The application uses Pydantic models for data validation. Here are some of the k
   from pydantic import BaseModel
 
   class Education(BaseModel):
-      id: str
-      institution: str
-      degree: str
-      field_of_study: str
-      start_date: str
-      end_date: str
+    institution : str
+    degree : str
+    start : str
+    end : str | None = None
+    desc : str
   ```
 
-- **Certification**:
+- **Certificate**:
   ```python
   from pydantic import BaseModel
 
-  class Certification(BaseModel):
-      id: str
-      name: str
-      issuing_organization: str
-      issue_date: str
-      expiration_date: str
+  class Certificate(BaseModel):
+    name: str
+    date: str
+    desc: str
   ```
 
 - **Skill**:
@@ -120,9 +117,10 @@ The application uses Pydantic models for data validation. Here are some of the k
   from pydantic import BaseModel
 
   class Skill(BaseModel):
-      id: str
-      name: str
-      proficiency: str
+    name: str
+    level: SkillLevel
+    tag: Tag
+    level_name: str | None = None
   ```
 
 ## Testing
