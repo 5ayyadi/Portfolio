@@ -4,7 +4,6 @@ from errors.error_handler import WrongInput
 
 
 class Work(BaseModel):
-    id : str | None = None
     company : str
     position : str
     start : str

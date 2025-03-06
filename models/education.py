@@ -2,7 +2,6 @@ from pydantic import BaseModel, field_validator, ValidationInfo
 from datetime import datetime
 from errors.error_handler import WrongInput
 class Education(BaseModel):
-    id: str | None = None
     institution : str
     degree : str
     start : str

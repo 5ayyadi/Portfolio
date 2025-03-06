@@ -3,7 +3,6 @@ from datetime import datetime
 from errors.error_handler import WrongInput
 
 class Certificate(BaseModel):
-    id: str | None = None
     name: str
     date: str
     desc: str
