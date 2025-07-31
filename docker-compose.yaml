@@ -17,7 +17,7 @@ services:
     container_name: fastapi
     environment:
       - MONGO_URI=${MONGO_URI}
-      - API_KEY=${API_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     ports:
       - 8000:8000
     depends_on:

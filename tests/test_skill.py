@@ -1,9 +1,9 @@
 from fastapi.testclient import TestClient
 from main import app
+from tests.auth_helper import get_auth_headers
 import os
 
 os.environ['TESTING'] = '1'
-API_KEY = os.getenv("API_KEY")
 
 client = TestClient(app)
 
@@ -16,7 +16,7 @@ skill_json = {
 def test_create_and_read_skill():
     response = client.post(
         "/skill/create/", 
-        headers={"api-key": API_KEY}, 
+        headers=get_auth_headers(), 
         json=skill_json
     )
     print(response.json())  # Add this line to print the response content

@@ -1,9 +1,36 @@
 # FastAPI Portfolio Project
 
-This project is a FastAPI-based web application designed to manage a personal portfolio, including features for adding, updating, and retrieving educational experiences, certifications, and skills.
+This project is a FastAPI-based web application designed to manage a personal portfolio, including features for adding, updating, and retrieving educational experiences, certifications, and skills. **Now with JWT-based authentication!**
+
+## 🔐 New! JWT Authentication
+
+This project now includes a complete JWT (JSON Web Token) authentication system:
+
+- **Secure Login**: Username/password authentication with JWT tokens
+- **Protected Endpoints**: All CRUD operations require valid JWT tokens  
+- **Token Expiration**: Configurable token expiration (default: 30 minutes)
+- **Modern Security**: bcrypt password hashing, HS256 token signing
+
+**Quick Start:**
+```bash
+# Start the server
+python start_server.py
+
+# Login to get JWT token
+curl -X POST "http://localhost:8000/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "admin123"}'
+
+# Use token for protected endpoints
+curl -X GET "http://localhost:8000/auth/protected" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+📚 **See [JWT_AUTH.md](JWT_AUTH.md) for complete authentication documentation.**
 
 ## Table of Contents
 
+- [🔐 JWT Authentication](#-new-jwt-authentication)
 - [Features](#features)
 - [Technologies](#technologies)
 - [Installation](#installation)
@@ -17,6 +44,7 @@ This project is a FastAPI-based web application designed to manage a personal po
 
 ## Features
 
+- **JWT Authentication**: Secure token-based authentication system
 - Create, read, update, and delete educational experiences, certifications, and skills.
 - Secure API access using API keys.
 - Unit tests for ensuring application reliability.

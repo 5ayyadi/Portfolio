@@ -2,7 +2,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException
 from models import Work, BaseResponse, WorkResponse
 from core.db import MongoDBClient
-from core.security import api_key_required
+from core.security import get_current_user
 from bson import ObjectId
 from controllers.time_calculator import calculate_duration
 from errors.error_schema import NoResultFound
@@ -14,13 +14,14 @@ router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-@router.post("/create", response_model=WorkResponse, dependencies=[Depends(api_key_required)])
-async def create_work_experience(work: Work):
+@router.post("/create", response_model=WorkResponse)
+async def create_work_experience(work: Work, current_user: dict = Depends(get_current_user)):
     """
         This Function creates the work experience info,
-        adds it to Work collection
+        adds it to Work collection.
+        Requires JWT authentication.
     """
-    logger.info("Creating work experience")
+    logger.info("Creating work experience by user: %s", current_user['username'])
     work_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Work")
     res = work_collection.insert_one(work.model_dump())
     logger.info(f"Work experience created with id: {res.inserted_id}")
@@ -44,12 +45,13 @@ async def read_work_experiences():
     return {"result": work_experiences}
 
 
-@router.put("/update/{id}", response_model=WorkResponse, dependencies=[Depends(api_key_required)])
-async def update_work_experience(id: str, work: Work):
+@router.put("/update/{id}", response_model=WorkResponse)
+async def update_work_experience(id: str, work: Work, current_user: dict = Depends(get_current_user)):
     """
         This Function updates a work experience info by its ID.
+        Requires JWT authentication.
     """
-    logger.info(f"Updating work experience with id: {id}")
+    logger.info(f"Updating work experience with id: {id} by user: {current_user['username']}")
     work_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Work")
     updated_work = work_collection.find_one_and_update(
         {"_id": ObjectId(id)},
@@ -65,12 +67,13 @@ async def update_work_experience(id: str, work: Work):
     return {"result": [updated_work], "msg": "Work experience updated successfully"}
 
 
-@router.delete("/delete/{id}", response_model=BaseResponse, dependencies=[Depends(api_key_required)])
-async def delete_work_experience(id: str):
+@router.delete("/delete/{id}", response_model=BaseResponse)
+async def delete_work_experience(id: str, current_user: dict = Depends(get_current_user)):
     """
         This Function deletes a work experience by its ID.
+        Requires JWT authentication.
     """
-    logger.info(f"Deleting work experience with id: {id}")
+    logger.info(f"Deleting work experience with id: {id} by user: {current_user['username']}")
     work_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Work")
     delete_result = work_collection.delete_one({"_id": ObjectId(id)})
 

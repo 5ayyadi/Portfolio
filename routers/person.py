@@ -2,7 +2,7 @@ import logging
 from fastapi import APIRouter, Depends
 from models import PersonResponse, Person, BaseResponse
 from core.db import MongoDBClient
-from core.security import api_key_required
+from core.security import get_current_user
 from controllers.time_calculator import calculate_age
 from errors.error_schema import NoResultFound
 
@@ -12,13 +12,14 @@ router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-@router.post("/create/", response_model=PersonResponse, dependencies=[Depends(api_key_required)])
-async def create_person(person: Person):
+@router.post("/create/", response_model=PersonResponse)
+async def create_person(person: Person, current_user: dict = Depends(get_current_user)):
     """
         This Function creates the personal info,
         if there's an exisiting person modify it.
+        Requires JWT authentication.
     """
-    logger.info(f"Creating or updating person {person.model_dump_json()}")
+    logger.info(f"Creating or updating person {person.model_dump_json()} by user: {current_user['username']}")
     person_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Person")
     existing_person = person_collection.find_one()
     

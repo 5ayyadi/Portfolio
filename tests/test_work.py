@@ -1,9 +1,9 @@
 from fastapi.testclient import TestClient
 from main import app
+from tests.auth_helper import get_auth_headers
 import os
 
 os.environ['TESTING'] = '1'
-API_KEY = os.getenv("API_KEY")
 
 client = TestClient(app)
 
@@ -17,8 +17,8 @@ work_json = {
 
 def test_create_work():
     response = client.post(
-        "/work/create/", 
-        headers={"api-key": API_KEY}, 
+        "/work/create", 
+        headers=get_auth_headers(), 
         json=work_json
     )
     assert response.status_code == 200

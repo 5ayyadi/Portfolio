@@ -2,7 +2,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException
 from models import Skill, SkillResponse, BaseResponse
 from core.db import MongoDBClient
-from core.security import api_key_required
+from core.security import get_current_user
 from bson import ObjectId
 from errors.error_schema import NoResultFound
 
@@ -12,14 +12,15 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-@router.post("/create/", response_model=SkillResponse, dependencies=[Depends(api_key_required)])
-async def create_skill(skill: Skill):
+@router.post("/create/", response_model=SkillResponse)
+async def create_skill(skill: Skill, current_user: dict = Depends(get_current_user)):
     """creates the skill with corresponding level
 
     Args:
         skill (Skill): A skill with a name and level from 1 to 6
+        Requires JWT authentication.
     """
-    logger.info("Creating a new skill: %s", skill)
+    logger.info("Creating a new skill: %s by user: %s", skill, current_user['username'])
     skill_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Skill")
     res = skill_collection.insert_one(skill.model_dump())
     logger.info("Skill created successfully with id: %s", res.inserted_id)
@@ -41,12 +42,13 @@ async def read_skills():
     return {"result": skills}
 
 
-@router.put("/update/{id}", response_model=SkillResponse, dependencies=[Depends(api_key_required)])
-async def update_skill(id: str, skill: Skill):
+@router.put("/update/{id}", response_model=SkillResponse)
+async def update_skill(id: str, skill: Skill, current_user: dict = Depends(get_current_user)):
     """
         This Function updates a skill by ID.
+        Requires JWT authentication.
     """
-    logger.info("Updating skill with id: %s", id)
+    logger.info("Updating skill with id: %s by user: %s", id, current_user['username'])
     skill_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Skill")
     updated_skill = skill_collection.find_one_and_update(
         {"_id": ObjectId(id)},
@@ -61,12 +63,13 @@ async def update_skill(id: str, skill: Skill):
     return {"result": [updated_skill], "msg": "Skill updated successfully"}
 
 
-@router.delete("/delete/{id}", response_model=BaseResponse, dependencies=[Depends(api_key_required)])
-async def delete_skill(id: str):
+@router.delete("/delete/{id}", response_model=BaseResponse)
+async def delete_skill(id: str, current_user: dict = Depends(get_current_user)):
     """
-        This Function deletes a skill by its ID. 
+        This Function deletes a skill by its ID.
+        Requires JWT authentication.
     """
-    logger.info("Deleting skill with id: %s", id)
+    logger.info("Deleting skill with id: %s by user: %s", id, current_user['username'])
     skill_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Skill")
     delete_result = skill_collection.delete_one({"_id": ObjectId(id)})
 

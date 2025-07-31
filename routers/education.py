@@ -2,7 +2,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException
 from models import Education, BaseResponse, EducationResponse
 from core.db import MongoDBClient
-from core.security import api_key_required
+from core.security import get_current_user
 from bson import ObjectId
 from controllers.time_calculator import calculate_duration
 from errors.error_schema import NoResultFound
@@ -13,12 +13,13 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Education Crud
-@router.post("/create/", response_model=EducationResponse, dependencies=[Depends(api_key_required)])
-async def create_education(education: Education):
+@router.post("/create/", response_model=EducationResponse)
+async def create_education(education: Education, current_user: dict = Depends(get_current_user)):
     """
     This function creates a new education experience.
+    Requires JWT authentication.
     """
-    logger.info("Creating a new education experience")
+    logger.info("Creating a new education experience by user: %s", current_user['username'])
     education_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Education")
     res = education_collection.insert_one(education.model_dump())
     return {"result": [education], "msg": "Education experience created successfully"}
@@ -39,12 +40,13 @@ async def read_education_experiences():
     return {"result": education_experiences}
 
 
-@router.put("/update/{id}", response_model=EducationResponse, dependencies=[Depends(api_key_required)])
-async def update_education_experience(id: str, education: Education):
+@router.put("/update/{id}", response_model=EducationResponse)
+async def update_education_experience(id: str, education: Education, current_user: dict = Depends(get_current_user)):
     """
     This function updates an existing education experience.
+    Requires JWT authentication.
     """
-    logger.info(f"Updating education experience with id: {id}")
+    logger.info(f"Updating education experience with id: {id} by user: {current_user['username']}")
     education_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Education")
     result = education_collection.update_one(
         {"_id": ObjectId(id)}, 
@@ -59,12 +61,13 @@ async def update_education_experience(id: str, education: Education):
     return {"result": [education], "msg": "Education experience updated successfully"}
 
 
-@router.delete("/delete/{id}", response_model=BaseResponse, dependencies=[Depends(api_key_required)])
-async def delete_education_experience(id: str):
+@router.delete("/delete/{id}", response_model=BaseResponse)
+async def delete_education_experience(id: str, current_user: dict = Depends(get_current_user)):
     """
     This function deletes an education experience.
+    Requires JWT authentication.
     """
-    logger.info(f"Deleting education experience with id: {id}")
+    logger.info(f"Deleting education experience with id: {id} by user: {current_user['username']}")
     education_collection = MongoDBClient.get_client().get_database("Portfolio").get_collection("Education")
     result = education_collection.delete_one({"_id": ObjectId(id)})
 
